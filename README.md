@@ -18,7 +18,7 @@ Welcome to the **Mission Quizify** project! This repository contains the impleme
 - [Setup and Installation](#setup-and-installation)
 - [Usage](#usage)
 - [Contributing](#contributing)
-- [License](#license)
+
 
 ## Introduction
 
