@@ -57,20 +57,35 @@ class ChromaCollectionCreator:
         # Use a TextSplitter from Langchain to split the documents into smaller text chunks
         # https://python.langchain.com/docs/modules/data_connection/document_transformers/character_text_splitter
         # [Your code here for splitting documents]
-        
+        textSplitter = CharacterTextSplitter(
+            separator="\n",
+            length_function=len
+        )
+        texts=textSplitter.split_documents(self.processor.pages)
+
         if texts is not None:
             st.success(f"Successfully split pages to {len(texts)} documents!", icon="✅")
+        
 
         # Step 3: Create the Chroma Collection
         # https://docs.trychroma.com/
         # Create a Chroma in-memory client using the text chunks and the embeddings model
         # [Your code here for creating Chroma collection]
-        
+            
+        self.db = Chroma.from_documents(texts, self.embed_model) 
         if self.db:
             st.success("Successfully created Chroma Collection!", icon="✅")
         else:
             st.error("Failed to create Chroma Collection!", icon="🚨")
     
+    def as_retriever(self):
+            """
+            Provides the retriever functionality required for the vectorstore.
+            Returns the retriever functionality for the vectorstore.
+            """
+            retriever = self.db.as_retriever()
+            return retriever
+
     def query_chroma_collection(self, query) -> Document:
         """
         Queries the created Chroma collection for documents similar to the query.
@@ -88,22 +103,22 @@ class ChromaCollectionCreator:
             st.error("Chroma Collection has not been created!", icon="🚨")
 
 if __name__ == "__main__":
-    processor = DocumentProcessor() # Initialize from Task 3
+    processor = DocumentProcessor()  # Initialize from Task 3
     processor.ingest_documents()
-    
+
     embed_config = {
         "model_name": "textembedding-gecko@003",
-        "project": "YOUR PROJECT ID HERE",
-        "location": "us-central1"
+        "project": "gemini-quizify-429800",
+        "location": "us-east4"
     }
-    
-    embed_client = EmbeddingClient(**embed_config) # Initialize from Task 4
-    
+
+    embed_client = EmbeddingClient(**embed_config)  # Initialize from Task 4
+
     chroma_creator = ChromaCollectionCreator(processor, embed_client)
-    
+
     with st.form("Load Data to Chroma"):
         st.write("Select PDFs for Ingestion, then click Submit")
-        
+
         submitted = st.form_submit_button("Submit")
         if submitted:
             chroma_creator.create_chroma_collection()

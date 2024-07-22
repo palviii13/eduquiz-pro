@@ -3,6 +3,6 @@ db/
 __pycache__/
 application_key.json
 ai-data.json
-
+gemini-quizify-429800-3f91a8ab183d.json
 # Tasks
 *_solution.py
